@@ -6,4 +6,6 @@ obj/
 *.log
 *.db
 *.sqlite
+appsettings.json
 appsettings.Development.json
+.vs/

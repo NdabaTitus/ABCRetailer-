@@ -16,21 +16,30 @@ namespace ABCRetailer.Services
         private readonly ILogger<AzureStorageService> _logger;
 
         public AzureStorageService(
-            IConfiguration configuration,
-            ILogger<AzureStorageService> logger)
+     IConfiguration configuration,
+     ILogger<AzureStorageService> logger)
         {
             string connectionString = configuration.GetConnectionString("AzureStorage")
                 ?? throw new InvalidOperationException("Azure Storage connection string not found");
 
-            _tableServiceClient = new TableServiceClient(connectionString);
-            _blobServiceClient = new BlobServiceClient(connectionString);
-            _queueServiceClient = new QueueServiceClient(connectionString);
-            _shareServiceClient = new ShareServiceClient(connectionString);
             _logger = logger;
 
-            InitializeStorageAsync().Wait();
-        }
+            // Only initialize clients if a real connection string is provided
+            if (!string.IsNullOrWhiteSpace(connectionString) &&
+                !connectionString.Contains("YOUR_ACCOUNT_KEY_HERE"))
+            {
+                _tableServiceClient = new TableServiceClient(connectionString);
+                _blobServiceClient = new BlobServiceClient(connectionString);
+                _queueServiceClient = new QueueServiceClient(connectionString);
+                _shareServiceClient = new ShareServiceClient(connectionString);
 
+                InitializeStorageAsync().Wait();
+            }
+            else
+            {
+                _logger.LogWarning("Azure Storage connection string not set or is a placeholder. Skipping Azure initialization.");
+            }
+        }
         private async Task InitializeStorageAsync()
         {
             try
@@ -70,6 +79,9 @@ namespace ABCRetailer.Services
         // ------------------ TABLE STORAGE ------------------
         public async Task<List<T>> GetAllEntitiesAsync<T>() where T : class, ITableEntity, new()
         {
+            if (_tableServiceClient == null)
+                throw new InvalidOperationException("Azure Table Service is not initialized. Check your connection string.");
+
             var tableName = GetTableName<T>();
             var tableClient = _tableServiceClient.GetTableClient(tableName);
 
