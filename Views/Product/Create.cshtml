@@ -1,4 +1,5 @@
-﻿@model ABCRetailer.Models.Product
+﻿<!-- Views/Product/Create.cshtml -->
+@model ABCRetailer.Models.Product
 @{
     ViewData["Title"] = "Create Product";
 }
@@ -28,7 +29,7 @@
                         <label asp-for="Price" class="form-label">Price</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" placeholder="29.99" required id="Price" />
+                            <input asp-for="Price" name="Price" class="form-control" type="text" placeholder="29.99" required />
                         </div>
                         <span asp-validation-for="Price" class="text-danger"></span>
                         <div class="form-text">Enter price in dollars (e.g., 29.99) - Required field</div>
@@ -91,21 +92,57 @@
 </div>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-        <script>
-            // Real-time price validation
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Form submission validation with enhanced price checking
+        document.querySelector('form').addEventListener('submit', function(e) {
             const priceInput = document.getElementById('Price');
-            priceInput.addEventListener('input', function(e) {
-                const value = parseFloat(e.target.value);
-                const errorSpan = document.querySelector('[data-valmsg-for="Price"]');
+            const priceValue = priceInput.value.trim();
 
-                if (isNaN(value) || value <= 0) {
+            console.log('Form submitted with price value:', priceValue);
+
+            // Check if price is empty
+            if (!priceValue) {
+                e.preventDefault();
+                alert('Please enter a price for the product');
+                priceInput.focus();
+                return false;
+            }
+
+            // Try to parse the price
+            const price = parseFloat(priceValue);
+            if (isNaN(price) || price <= 0) {
+                e.preventDefault();
+                alert('Please enter a valid price greater than $0.00');
+                priceInput.focus();
+                return false;
+            }
+
+            console.log('Price validation passed:', price);
+        });
+
+        // Real-time price validation
+        document.getElementById('Price').addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            const errorSpan = document.querySelector('[data-valmsg-for="Price"]');
+
+            if (value) {
+                const price = parseFloat(value);
+                if (isNaN(price) || price <= 0) {
                     if (errorSpan) errorSpan.textContent = 'Please enter a valid price greater than $0.00';
                     e.target.style.borderColor = '#dc3545';
                 } else {
                     if (errorSpan) errorSpan.textContent = '';
                     e.target.style.borderColor = '#28a745';
                 }
-            });
-        </script>
+            } else {
+                if (errorSpan) errorSpan.textContent = 'Price is required';
+                e.target.style.borderColor = '#dc3545';
+            }
+        });
+    </script>
 }
+
+

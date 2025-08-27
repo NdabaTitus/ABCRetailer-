@@ -36,16 +36,19 @@ namespace ABCRetailer.Controllers
             {
                 try
                 {
-                    var originalCustomer = await _storageService.GetEntityAsync<Customer>("Customer", customer.RowKey);
-                    if(originalCustomer != null)
+                    // Check if a customer with this RowKey already exists
+                    var existingCustomer = await _storageService.GetEntityAsync<Customer>("Customer", customer.RowKey);
+                    if (existingCustomer != null)
                     {
-                        return NotFound();
+                        ModelState.AddModelError("", "Customer already exists.");
+                        return View(customer);
                     }
-                    originalCustomer.Name = customer.Name;
-                    originalCustomer.Surname = customer.Surname;
-                    originalCustomer.Email = customer.Email;
-                    originalCustomer.Username = customer.Username;
-                    originalCustomer.ShippingAddress = customer.ShippingAddress;
+
+                    // Add new customer
+                    await _storageService.AddEntityAsync(customer);
+
+                    TempData["Success"] = "Customer created successfully!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
