@@ -11,3 +11,4 @@ appsettings.Development.json
 .vs/publish/local.settings.json
 .vs/
 .vs/
+publish/local.settings.json
