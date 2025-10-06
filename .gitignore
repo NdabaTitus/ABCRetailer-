@@ -1,15 +1,45 @@
-bin/
-obj/
+# Visual Studio temporary files
+.vs/
 *.user
 *.suo
-*.cache
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+out/
+
+# Rider / JetBrains
+.idea/
+
+# Node / npm (if using front-end)
+node_modules/
+dist/
+
+# Azure Functions local settings (contains secrets)
+local.settings.json
+publish/
+
+# Logs
 *.log
-*.db
-*.sqlite
-appsettings.json
-appsettings.Development.json
-.vs/publish/local.settings.json
-.vs/
-.vs/
-publish/local.settings.json
-publish/local.settings.json
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Visual Studio Code
+.vscode/
+
+# Others
+*.dbmdl
+*.bak
+*.backup
+*.tmp
