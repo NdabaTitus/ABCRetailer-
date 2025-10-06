@@ -8,4 +8,4 @@ obj/
 *.sqlite
 appsettings.json
 appsettings.Development.json
-.vs/
+.vs/publish/local.settings.json
